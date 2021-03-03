@@ -1,6 +1,6 @@
 ﻿/*
  * SonarScanner for MSBuild
- * Copyright (C) 2016-2020 SonarSource SA
+ * Copyright (C) 2016-2021 SonarSource SA
  * mailto:info AT sonarsource DOT com
  *
  * This program is free software; you can redistribute it and/or
@@ -36,11 +36,11 @@ namespace SonarScanner.MSBuild.Common
         /// <summary>
         /// Name of the import before target file
         /// </summary>
-        public const string ImportBeforeTargetsName = "SonarQube.Integration.ImportBefore.targets";
+        public const string ImportBeforeTargetsName = "Sonar.Integration.ImportBefore.targets";
 
         /// <summary>
         /// Name of the targets file that contains the integration pieces
         /// </summary>
-        public const string IntegrationTargetsName = "SonarQube.Integration.targets";
+        public const string IntegrationTargetsName = "Sonar.Integration.targets";
     }
 }

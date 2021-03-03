@@ -1,6 +1,6 @@
 ﻿/*
  * SonarScanner for MSBuild
- * Copyright (C) 2016-2020 SonarSource SA
+ * Copyright (C) 2016-2021 SonarSource SA
  * mailto:info AT sonarsource DOT com
  *
  * This program is free software; you can redistribute it and/or
@@ -130,7 +130,7 @@ namespace SonarScanner.MSBuild.PreProcessor
         }
 
         /// <summary>
-        /// Logs a warning when \Program Files (x86)\MSBuild\14.0\Microsoft.Common.Targets\ImportBefore\SonarQube.Integration.ImportBefore.targets exists.
+        /// Logs a warning when \Program Files (x86)\MSBuild\14.0\Microsoft.Common.Targets\ImportBefore\Sonar.Integration.ImportBefore.targets exists.
         /// </summary>
         private void WarnOnGlobalTargetsFile()
         {

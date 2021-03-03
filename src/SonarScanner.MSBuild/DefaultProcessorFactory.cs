@@ -1,6 +1,6 @@
-﻿/*
+/*
  * SonarScanner for MSBuild
- * Copyright (C) 2016-2020 SonarSource SA
+ * Copyright (C) 2016-2021 SonarSource SA
  * mailto:info AT sonarsource DOT com
  *
  * This program is free software; you can redistribute it and/or
@@ -40,7 +40,6 @@ namespace SonarScanner.MSBuild
             return new MSBuildPostProcessor(
                 new SonarScannerWrapper(logger),
                 logger,
-                new TargetsUninstaller(logger),
                 new TfsProcessorWrapper(logger),
                 new SonarProjectPropertiesValidator());
         }

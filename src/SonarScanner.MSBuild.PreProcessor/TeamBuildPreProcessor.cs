@@ -1,6 +1,6 @@
-﻿/*
+/*
  * SonarScanner for MSBuild
- * Copyright (C) 2016-2020 SonarSource SA
+ * Copyright (C) 2016-2021 SonarSource SA
  * mailto:info AT sonarsource DOT com
  *
  * This program is free software; you can redistribute it and/or
@@ -168,7 +168,7 @@ namespace SonarScanner.MSBuild.PreProcessor
             }
         }
 
-        private async Task<ArgumentsAndRuleSets> FetchArgumentsAndRulesets(ISonarQubeServer server, ProcessedArgs args, TeamBuildSettings settings)
+        private async Task<ArgumentsAndRuleSets> FetchArgumentsAndRulesets(ISonarServer server, ProcessedArgs args, TeamBuildSettings settings)
         {
             ArgumentsAndRuleSets argumentsAndRuleSets = new ArgumentsAndRuleSets();
 

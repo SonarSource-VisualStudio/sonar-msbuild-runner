@@ -1,6 +1,6 @@
 ﻿/*
  * SonarScanner for MSBuild
- * Copyright (C) 2016-2020 SonarSource SA
+ * Copyright (C) 2016-2021 SonarSource SA
  * mailto:info AT sonarsource DOT com
  *
  * This program is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@ using SonarScanner.MSBuild.Common;
 namespace SonarScanner.MSBuild.PreProcessor
 {
     /// <summary>
-    /// Copies the loader targets file - SonarQube.Integration.ImportBefore.targets - to a user specific location
+    /// Copies the loader targets file - Sonar.Integration.ImportBefore.targets - to a user specific location
     /// from where MsBuild can automatically import it. Also gives a warning if such a file is present in the non-user specific directory.
     /// </summary>
     public interface ITargetsInstaller

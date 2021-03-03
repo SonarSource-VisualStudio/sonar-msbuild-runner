@@ -1,6 +1,6 @@
 ﻿/*
  * SonarScanner for MSBuild
- * Copyright (C) 2016-2020 SonarSource SA
+ * Copyright (C) 2016-2021 SonarSource SA
  * mailto:info AT sonarsource DOT com
  *
  * This program is free software; you can redistribute it and/or
@@ -31,7 +31,7 @@ using SonarScanner.MSBuild.PreProcessor.Roslyn.Model;
 
 namespace SonarScanner.MSBuild.PreProcessor
 {
-    public sealed class SonarWebService : ISonarQubeServer, IDisposable
+    public sealed class SonarWebService : ISonarServer, IDisposable
     {
         private const string oldDefaultProjectTestPattern = @"[^\\]*test[^\\]*$";
         private readonly string serverUrl;
@@ -51,7 +51,7 @@ namespace SonarScanner.MSBuild.PreProcessor
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        #region ISonarQubeServer interface
+        #region ISonarServer interface
 
         public async Task<Tuple<bool, string>> TryGetQualityProfile(string projectKey, string projectBranch, string organization, string language)
         {
@@ -74,8 +74,16 @@ namespace SonarScanner.MSBuild.PreProcessor
 
                 var json = JObject.Parse(contents);
                 var profiles = json["profiles"].Children<JObject>();
+                JObject profile = null;
+                try
+                {
+                    profile = profiles.SingleOrDefault(p => language.Equals(p["language"].ToString()));
+                }
+                catch (InvalidOperationException) //As we don't have fail-fast policy for unsupported version for now, we should handle gracefully multi-QPs set for a project, here for SQ < 6.7
+                {
+                    throw new AnalysisException(Resources.ERROR_UnsupportedSonarQubeVersion);
+                }
 
-                var profile = profiles.SingleOrDefault(p => language.Equals(p["language"].ToString()));
                 if (profile == null)
                 {
                     return null;
@@ -97,11 +105,11 @@ namespace SonarScanner.MSBuild.PreProcessor
         public async Task<IList<SonarRule>> GetInactiveRules(string qprofile, string language)
         {
             var fetched = 0;
-            var page = 1;
             var total = 0;
             var ruleList = new List<SonarRule>();
 
-            do
+
+            for (int page = 1; page <= 20; page++)
             {
                 var ws = GetUrl("/api/rules/search?f=repo,name,severity,lang,internalKey,templateKey,params&ps=500&activation=false&qprofile={0}&p={1}&languages={2}", qprofile, page.ToString(), language);
                 this.logger.LogDebug(Resources.MSG_FetchingInactiveRules, qprofile, language, ws);
@@ -112,12 +120,17 @@ namespace SonarScanner.MSBuild.PreProcessor
                     var json = JObject.Parse(contents);
                     total = json["total"].ToObject<int>();
                     fetched += json["ps"].ToObject<int>();
-                    page++;
                     var rules = json["rules"].Children<JObject>();
 
                     return rules.Select(r => new SonarRule(r["repo"].ToString(), ParseRuleKey(r["key"].ToString()), false));
                 }, ws));
-            } while (fetched < total);
+
+                if (fetched >= total)
+                {
+                    break;
+                }
+
+            }
 
             return ruleList;
         }
@@ -131,11 +144,10 @@ namespace SonarScanner.MSBuild.PreProcessor
         public async Task<IList<SonarRule>> GetActiveRules(string qprofile)
         {
             var fetched = 0;
-            var page = 1;
             var total = 0;
             var activeRuleList = new List<SonarRule>();
 
-            do
+            for (int page = 1; page <= 20; page++)
             {
                 var ws = GetUrl("/api/rules/search?f=repo,name,severity,lang,internalKey,templateKey,params,actives&ps=500&activation=true&qprofile={0}&p={1}", qprofile, page.ToString());
                 this.logger.LogDebug(Resources.MSG_FetchingActiveRules, qprofile, ws);
@@ -146,8 +158,6 @@ namespace SonarScanner.MSBuild.PreProcessor
                     var json = JObject.Parse(contents);
                     total = json["total"].ToObject<int>();
                     fetched += json["ps"].ToObject<int>();
-                    page++;
-
                     var rules = json["rules"].Children<JObject>();
                     var actives = json["actives"];
 
@@ -156,7 +166,12 @@ namespace SonarScanner.MSBuild.PreProcessor
                         return FilterRule(r, actives);
                     });
                 }, ws));
-            } while (fetched < total);
+
+                if (fetched >= total)
+                {
+                    break;
+                }
+            }
 
             return activeRuleList;
         }
@@ -317,7 +332,7 @@ namespace SonarScanner.MSBuild.PreProcessor
             }, url);
         }
 
-        #endregion ISonarQubeServer interface
+        #endregion ISonarServer interface
 
         #region Private methods
 
@@ -379,7 +394,7 @@ namespace SonarScanner.MSBuild.PreProcessor
             var ws = GetUrl("/api/settings/values?component={0}", projectId);
             this.logger.LogDebug(Resources.MSG_FetchingProjectProperties, projectId, ws);
 
-            var projectFound = await DoLogExceptions(async() => await this.downloader.TryDownloadIfExists(ws, true), ws);
+            var projectFound = await DoLogExceptions(async () => await this.downloader.TryDownloadIfExists(ws, true), ws);
 
             var contents = projectFound?.Item2;
 
@@ -387,10 +402,10 @@ namespace SonarScanner.MSBuild.PreProcessor
             {
                 ws = GetUrl("/api/settings/values");
                 this.logger.LogDebug("No settings for project {0}. Getting global settings: {1}", projectId, ws);
-                contents = await DoLogExceptions(async() => await this.downloader.Download(ws), ws);
+                contents = await DoLogExceptions(async () => await this.downloader.Download(ws), ws);
             }
 
-            return await DoLogExceptions(async() => ParseSettingsResponse(contents), ws);
+            return await DoLogExceptions(async () => ParseSettingsResponse(contents), ws);
         }
 
         private Dictionary<string, string> ParseSettingsResponse(string contents)

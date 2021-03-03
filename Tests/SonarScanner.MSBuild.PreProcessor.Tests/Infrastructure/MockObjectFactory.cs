@@ -1,6 +1,6 @@
-﻿/*
+/*
  * SonarScanner for MSBuild
- * Copyright (C) 2016-2020 SonarSource SA
+ * Copyright (C) 2016-2021 SonarSource SA
  * mailto:info AT sonarsource DOT com
  *
  * This program is free software; you can redistribute it and/or
@@ -24,16 +24,16 @@ namespace SonarScanner.MSBuild.PreProcessor.Tests
 {
     internal class MockObjectFactory : IPreprocessorObjectFactory
     {
-        private readonly ISonarQubeServer server;
+        private readonly ISonarServer server;
         private readonly IAnalyzerProvider analyzerProvider;
         private readonly ITargetsInstaller targetsInstaller;
 
-        public MockObjectFactory(ISonarQubeServer server)
+        public MockObjectFactory(ISonarServer server)
         {
             this.server = server;
         }
 
-        public MockObjectFactory(ISonarQubeServer server, ITargetsInstaller targetsInstaller, IAnalyzerProvider analyzerProvider)
+        public MockObjectFactory(ISonarServer server, ITargetsInstaller targetsInstaller, IAnalyzerProvider analyzerProvider)
         {
             this.server = server;
             this.targetsInstaller = targetsInstaller;
@@ -47,7 +47,7 @@ namespace SonarScanner.MSBuild.PreProcessor.Tests
             return this.analyzerProvider;
         }
 
-        public ISonarQubeServer CreateSonarQubeServer(ProcessedArgs args)
+        public ISonarServer CreateSonarQubeServer(ProcessedArgs args)
         {
             args.Should().NotBeNull();
 

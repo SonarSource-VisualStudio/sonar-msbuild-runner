@@ -1,6 +1,6 @@
 ﻿/*
  * SonarScanner for MSBuild
- * Copyright (C) 2016-2020 SonarSource SA
+ * Copyright (C) 2016-2021 SonarSource SA
  * mailto:info AT sonarsource DOT com
  *
  * This program is free software; you can redistribute it and/or
@@ -29,7 +29,7 @@ using SonarScanner.MSBuild.Common;
 namespace SonarScanner.MSBuild.PreProcessor.Roslyn
 {
     /// <summary>
-    /// Handles fetching embedded resources from SonarQube plugins
+    /// Handles fetching embedded resources from SonarQube / SonarCloud plugins
     /// </summary>
     /// <remarks>
     /// <para>
@@ -39,23 +39,23 @@ namespace SonarScanner.MSBuild.PreProcessor.Roslyn
     /// can't then use them.
     /// </para>
     /// <para>
-    /// The plugin resources are cached locally under %temp%\.sonarqube\.static\[package_version]\[resource]
+    /// The plugin resources are cached locally under %temp%\.sonar\.static\[package_version]\[resource]
     /// If the required version is available locally then it will not be downloaded from the
-    /// SonarQube server.
+    /// SonarQube server or SonarCloud.
     /// </para>
     /// </remarks>
     public class EmbeddedAnalyzerInstaller : IAnalyzerInstaller
     {
-        private readonly ISonarQubeServer server;
+        private readonly ISonarServer server;
         private readonly ILogger logger;
         private readonly PluginResourceCache cache;
 
-        public EmbeddedAnalyzerInstaller(ISonarQubeServer server, ILogger logger)
+        public EmbeddedAnalyzerInstaller(ISonarServer server, ILogger logger)
             : this(server, GetLocalCacheDirectory(), logger)
         {
         }
 
-        public EmbeddedAnalyzerInstaller(ISonarQubeServer server, string localCacheDirectory, ILogger logger)
+        public EmbeddedAnalyzerInstaller(ISonarServer server, string localCacheDirectory, ILogger logger)
         {
             if (string.IsNullOrWhiteSpace(localCacheDirectory))
             {
@@ -113,7 +113,7 @@ namespace SonarScanner.MSBuild.PreProcessor.Roslyn
         /// </summary>
         private static string GetLocalCacheDirectory()
         {
-            var localCache = Path.Combine(Path.GetTempPath(), ".sonarqube", "resources");
+            var localCache = Path.Combine(Path.GetTempPath(), ".sonar", "resources");
             return localCache;
         }
 
