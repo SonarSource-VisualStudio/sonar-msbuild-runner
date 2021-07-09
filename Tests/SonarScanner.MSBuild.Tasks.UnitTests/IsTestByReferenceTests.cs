@@ -59,15 +59,6 @@ namespace SonarScanner.MSBuild.Tasks.UnitTests
             ExecuteAndAssert(references, "FluentAssertions", "Resolved test reference: FluentAssertions");
         }
 
-        [DataTestMethod]
-        [DataRow("MOQ", "1.0")]
-        [DataRow("Moq", "2.0")]
-        [DataRow("MoQ", "3.0")]
-        [DataRow("moq", "4.0")]
-        // We need a different version for each test case, because AssemblyName implementation caches the instance and returns capitalization from the first usage
-        public void TestReference_TestReference_IsTest_CaseInsensitive(string name, string version) =>
-            ExecuteAndAssert(new string[] { $"{name}, Version={version}" }, name, "Resolved test reference: " + name);
-
         [TestMethod]
         public void TestReference_ShouldBeSynchronized()
         {
