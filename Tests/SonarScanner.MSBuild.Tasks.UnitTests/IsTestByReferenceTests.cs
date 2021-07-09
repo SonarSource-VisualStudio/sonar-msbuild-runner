@@ -59,37 +59,28 @@ namespace SonarScanner.MSBuild.Tasks.UnitTests
             ExecuteAndAssert(references, "FluentAssertions", "Resolved test reference: FluentAssertions");
         }
 
-        [DataTestMethod]
-        [DataRow("MOQ", "1.0")]
-        [DataRow("Moq", "2.0")]
-        [DataRow("MoQ", "3.0")]
-        [DataRow("moq", "4.0")]
-        // We need a different version for each test case, because AssemblyName implementation caches the instance and returns capitalization from the first usage
-        public void TestReference_TestReference_IsTest_CaseInsensitive(string name, string version) =>
-            ExecuteAndAssert(new string[] { $"{name}, Version={version}" }, name, "Resolved test reference: " + name);
-
         [TestMethod]
         public void TestReference_ShouldBeSynchronized()
         {
             // Purpose of this test is to remind us, that we need to synchronize this list with sonar-dotnet and sonar-security.
             var synchronizedSortedReferences = new[]
             {
-                "DOTMEMORY.UNIT",
-                "FAKEITEASY",
-                "FLUENTASSERTIONS",
-                "MICROSOFT.VISUALSTUDIO.TESTPLATFORM.TESTFRAMEWORK",
-                "MICROSOFT.VISUALSTUDIO.QUALITYTOOLS.UNITTESTFRAMEWORK",
-                "MACHINE.SPECIFICATIONS",
-                "MOQ",
-                "NSUBSTITUTE",
-                "NUNIT.FRAMEWORK",
-                "NUNITLITE",
-                "RHINO.MOCKS",
-                "SHOULDLY",
-                "TECHTALK.SPECFLOW",
-                "TELERIK.JUSTMOCK",
-                "XUNIT",
-                "XUNIT.CORE"
+                "dotMemory.Unit",
+                "Microsoft.VisualStudio.TestPlatform.TestFramework",
+                "Microsoft.VisualStudio.QualityTools.UnitTestFramework",
+                "Machine.Specifications",
+                "nunit.framework",
+                "nunitlite",
+                "TechTalk.SpecFlow",
+                "xunit",
+                "xunit.core",
+                "FluentAssertions",
+                "Shouldly",
+                "FakeItEasy",
+                "Moq",
+                "NSubstitute",
+                "Rhino.Mocks",
+                "Telerik.JustMock"
             };
             IsTestByReference.TestAssemblyNames.OrderBy(x => x).Should().BeEquivalentTo(synchronizedSortedReferences);
         }
